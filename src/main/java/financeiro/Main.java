@@ -64,7 +64,7 @@ public class Main {
         try {
             String descricao = lerTexto("Descrição: ");
             String categoria = lerTexto("Categoria (Enter = Outros): ");
-            BigDecimal valor = new BigDecimal(lerTexto("Valor (ex: 12,50): ").replace(",", "."));
+            BigDecimal valor = converterValor(lerTexto("Valor (ex: 1.500,00): "));
             String textoData = lerTexto("Data dd/mm/aaaa (Enter = hoje): ");
             LocalDate data = textoData.isEmpty() ? LocalDate.now() : LocalDate.parse(textoData, DATA_BR);
 
@@ -73,7 +73,7 @@ public class Main {
         } catch (DateTimeParseException e) {
             System.out.println("Data inválida. Use o formato dd/mm/aaaa.");
         } catch (NumberFormatException e) {
-            System.out.println("Valor inválido. Digite só números, ex: 12,50.");
+            System.out.println("Valor inválido. Exemplos: 12,50 ou 1.500,00.");
         } catch (IllegalArgumentException e) {
             System.out.println("Erro: " + e.getMessage());
         }
@@ -144,6 +144,17 @@ public class Main {
             System.out.println("Mês inválido, usando o mês atual.");
             return  YearMonth.now();
         }
+    }
+
+    // Aceita "12,50", "1.500,00", "1.500" e "12.50".
+    private BigDecimal converterValor(String texto) {
+        String limpo = texto.replace("R$", "").replace(" ", "");
+        if (limpo.contains(",")) {
+            limpo = limpo.replace(".", "").replace(",", ".");
+        } else if (limpo.matches("\\d{1,3}(\\.\\d{3})+")) {
+            limpo = limpo.replace(".", "");
+        }
+        return new BigDecimal(limpo);
     }
 
     private String lerTexto(String rotulo) {
